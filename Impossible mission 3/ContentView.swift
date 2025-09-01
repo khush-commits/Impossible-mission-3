@@ -45,18 +45,18 @@ struct ContentView: View {
     
     var body: some View {
         TabView {
-            // MARK: Agents
+            
+            // 🕵️ Agents Tab
             NavigationView {
                 ZStack {
-                    LinearGradient(colors: [.black, .gray.opacity(0.9)], startPoint: .top, endPoint: .bottom)
+                    LinearGradient(colors: [.black, .gray.opacity(0.8)], startPoint: .top, endPoint: .bottom)
                         .ignoresSafeArea()
                     
                     VStack {
                         Text("🔎 Impossible Mission Force")
-                            .font(.title)
-                            .fontWeight(.heavy)
+                            .font(.largeTitle.bold())
                             .foregroundColor(.white)
-                            .shadow(radius: 5)
+                            .shadow(radius: 4)
                             .padding(.top)
                         
                         ScrollView {
@@ -64,59 +64,98 @@ struct ContentView: View {
                                 Button {
                                     selectedAgent = agent
                                 } label: {
-                                    AgentCard(agent: agent)
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(agent.codename)
+                                                .font(.headline)
+                                                .foregroundColor(.white)
+                                            Text(agent.role)
+                                                .font(.subheadline)
+                                                .foregroundColor(.gray)
+                                        }
+                                        Spacer()
+                                        Image(systemName: "lock.shield.fill")
+                                            .foregroundColor(.blue)
+                                            .imageScale(.large)
+                                    }
+                                    .padding()
+                                    .background(.ultraThinMaterial)
+                                    .cornerRadius(15)
+                                    .shadow(radius: 3)
                                 }
                                 .padding(.horizontal)
-                                .padding(.bottom, 8)
+                                .padding(.top, 5)
                             }
                         }
                     }
                 }
                 .navigationTitle("Agent Files")
                 .sheet(item: $selectedAgent) { agent in
-                    AgentDetailView(agent: agent)
+                    VStack(spacing: 20) {
+                        Text("Codename: \(agent.codename)")
+                            .font(.largeTitle.bold())
+                        Text("Role: \(agent.role)")
+                            .font(.title3)
+                            .foregroundColor(.secondary)
+                        Divider()
+                        Text("🕵️ Secret Intel:")
+                            .font(.headline)
+                        Text(agent.secret)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                            .foregroundColor(.red)
+                        Spacer()
+                    }
+                    .padding()
                 }
             }
             .tabItem {
                 Label("Agents", systemImage: "person.3.fill")
             }
             
-            // MARK: Timeline
+            // ⏰ Timeline Tab
             NavigationStack {
                 ZStack {
-                    LinearGradient(colors: [.black, .blue.opacity(0.8)], startPoint: .top, endPoint: .bottom)
+                    LinearGradient(colors: [.black, .purple.opacity(0.8)], startPoint: .top, endPoint: .bottom)
                         .ignoresSafeArea()
                     
                     VStack {
-                        Text("🕵️ Incoin Heist Mission 🕵️")
-                            .font(.title)
-                            .fontWeight(.bold)
+                        Text("🕵️ Incoin Heist Mission")
+                            .font(.largeTitle.bold())
                             .foregroundColor(.white)
-                            .shadow(radius: 4)
+                            .shadow(radius: 3)
                             .padding(.bottom, 5)
                         
-                        List(events) { event in
-                            Button {
-                                selectedEvent = event
-                                showClues = true
-                            } label: {
-                                HStack {
-                                    Text(event.time)
-                                        .font(.headline)
-                                        .foregroundColor(.blue)
-                                    Spacer()
-                                    Text(event.description)
-                                        .font(.body)
+                        ScrollView {
+                            ForEach(events) { event in
+                                Button {
+                                    selectedEvent = event
+                                    showClues = true
+                                } label: {
+                                    VStack(alignment: .leading, spacing: 6) {
+                                        Text(event.time)
+                                            .font(.headline)
+                                            .foregroundColor(.yellow)
+                                        Text(event.description)
+                                            .font(.body)
+                                            .foregroundColor(.white)
+                                    }
+                                    .padding()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(.ultraThinMaterial)
+                                    .cornerRadius(15)
+                                    .shadow(radius: 4)
                                 }
+                                .padding(.horizontal)
+                                .padding(.top, 5)
                             }
                         }
-                        .scrollContentBackground(.hidden)
-                        .background(.clear)
                         
                         NavigationLink("📜 View Final Report", destination: FinalReportView())
                             .buttonStyle(.borderedProminent)
                             .tint(.red)
                             .padding()
+                            .shadow(radius: 3)
                     }
                 }
                 .navigationTitle("Timeline")
@@ -130,155 +169,72 @@ struct ContentView: View {
                 Label("Timeline", systemImage: "clock.fill")
             }
         }
+        .accentColor(.red)
     }
 }
 
-// MARK: Agent Card
-struct AgentCard: View {
-    let agent: Agent
-    
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 20)
-                .fill(LinearGradient(colors: [.blue.opacity(0.9), .black], startPoint: .topLeading, endPoint: .bottomTrailing))
-                .shadow(radius: 5)
-            
-            HStack {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text(agent.codename)
-                        .font(.title2)
-                        .bold()
-                        .foregroundColor(.white)
-                    Text(agent.role)
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.8))
-                }
-                Spacer()
-                Image(systemName: "lock.shield")
-                    .foregroundColor(.yellow)
-                    .font(.system(size: 28))
-            }
-            .padding()
-        }
-        .frame(height: 100)
-    }
-}
-
-// MARK: Agent Detail
-struct AgentDetailView: View {
-    let agent: Agent
-    
-    var body: some View {
-        ZStack {
-            LinearGradient(colors: [.black, .gray.opacity(0.9)], startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
-            
-            VStack(spacing: 20) {
-                Text("Codename: \(agent.codename)")
-                    .font(.largeTitle)
-                    .bold()
-                    .foregroundColor(.white)
-                
-                Text("Role: \(agent.role)")
-                    .font(.title3)
-                    .foregroundColor(.yellow)
-                
-                Divider().background(Color.white)
-                
-                Text("🕵️ Secret Intel:")
-                    .font(.headline)
-                    .foregroundColor(.red)
-                
-                Text(agent.secret)
-                    .multilineTextAlignment(.center)
-                    .padding()
-                    .foregroundColor(.white)
-                
-                Spacer()
-            }
-            .padding()
-        }
-    }
-}
-
-// MARK: Clue View
 struct ClueView: View {
     let event: Event
     
     var body: some View {
-        ZStack {
-            LinearGradient(colors: [.black, .red.opacity(0.8)], startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
+        VStack(spacing: 20) {
+            Text("Clue Unlocked!")
+                .font(.largeTitle.bold())
+                .foregroundColor(.red)
+                .shadow(radius: 3)
             
-            VStack(spacing: 20) {
-                Text("Clue Unlocked!")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundColor(.yellow)
-                
-                Text("Event: \(event.time)\n\n\(event.description)")
-                    .multilineTextAlignment(.center)
-                    .padding()
-                    .foregroundColor(.white)
-                
-                Text("Possible Hint: Look closely… not everything is what it seems 👀")
-                    .foregroundColor(.red)
-                    .italic()
-                
-                Spacer()
-            }
-            .padding()
+            Text("Event: \(event.time)\n\n\(event.description)")
+                .multilineTextAlignment(.center)
+                .padding()
+                .foregroundColor(.primary)
+            
+            Text("Possible Hint: Look closely… not everything is what it seems.")
+                .foregroundColor(.red)
+                .italic()
+                .padding()
+            
+            Spacer()
         }
+        .padding()
     }
 }
 
-// MARK: Final Report
 struct FinalReportView: View {
     var body: some View {
         ScrollView {
-            ZStack {
-                LinearGradient(colors: [.black, .gray.opacity(0.9)], startPoint: .top, endPoint: .bottom)
-                    .ignoresSafeArea()
+            VStack(alignment: .leading, spacing: 15) {
+                Text("📝 Final Report: The Incoin Heist")
+                    .font(.title.bold())
+                    .padding(.bottom, 10)
                 
-                VStack(alignment: .leading, spacing: 15) {
-                    Text("📝 Final Report: The Incoin Heist")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundColor(.yellow)
-                    
+                Group {
                     Text("Who was the accomplice? ❓")
-                        .foregroundColor(.white)
-                    Text("👉 The corrupt security guard at the train station.")
-                        .foregroundColor(.blue)
+                        .font(.headline)
+                    Text("👉 The corrupt security guard at the train station.\n")
                     
                     Text("Where did they flee? ❓")
-                        .foregroundColor(.white)
-                    Text("👉 They escaped toward an abandoned warehouse near the docks.")
-                        .foregroundColor(.blue)
+                        .font(.headline)
+                    Text("👉 They escaped toward an abandoned warehouse near the docks.\n")
                     
                     Text("Why was Incoin stolen? ❓")
-                        .foregroundColor(.white)
-                    Text("👉 To fund a rogue underground tech syndicate.")
-                        .foregroundColor(.blue)
+                        .font(.headline)
+                    Text("👉 To fund a rogue underground tech syndicate.\n")
                     
                     Text("How did they steal the Incoin? ❓")
-                        .foregroundColor(.white)
-                    Text("👉 By disabling cameras, staging a blackout, and using a magnetic disruptor to crack the vault.")
-                        .foregroundColor(.blue)
+                        .font(.headline)
+                    Text("👉 By disabling cameras, staging a blackout, and using a magnetic disruptor to crack the vault.\n")
                     
                     Text("Where are they now? ❓")
-                        .foregroundColor(.white)
-                    Text("👉 Still hiding in the city, but their digital trail is being tracked.")
-                        .foregroundColor(.blue)
-                    
-                    Divider().background(Color.red)
-                    
-                    Text("Mission Complete ✅")
                         .font(.headline)
-                        .foregroundColor(.green)
+                    Text("👉 Still hiding in the city, but their digital trail is being tracked.\n")
                 }
-                .padding()
+                
+                Divider()
+                Text("Mission Complete ✅")
+                    .font(.headline)
+                    .foregroundColor(.green)
             }
+            .padding()
         }
     }
 }
